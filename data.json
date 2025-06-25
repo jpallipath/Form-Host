@@ -1,0 +1,22 @@
+[
+  {
+    "Category": "Fruits",
+    "Subcategory": "Citrus",
+    "Item": "Orange"
+  },
+  {
+    "Category": "Fruits",
+    "Subcategory": "Citrus",
+    "Item": "Lemon"
+  },
+  {
+    "Category": "Fruits",
+    "Subcategory": "Tropical",
+    "Item": "Mango"
+  },
+  {
+    "Category": "Veggies",
+    "Subcategory": "Root",
+    "Item": "Carrot"
+  }
+]

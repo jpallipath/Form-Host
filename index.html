@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Form</title>
+</head>
+<body>
+  <form id="dynamicForm">
+    <label>Category:</label>
+    <select id="category" required></select>
+
+    <br><br>
+    <label>Subcategory:</label>
+    <select id="subcategory" required></select>
+
+    <br><br>
+    <label>Item:</label>
+    <select id="item" required></select>
+
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Replace this with your JSON data from Excel
+    let data = [
+      { Category: "Fruits", Subcategory: "Citrus", Item: "Orange" },
+      { Category: "Fruits", Subcategory: "Citrus", Item: "Lemon" },
+      { Category: "Fruits", Subcategory: "Tropical", Item: "Mango" },
+      { Category: "Veggies", Subcategory: "Leafy", Item: "Spinach" },
+      { Category: "Veggies", Subcategory: "Root", Item: "Carrot" }
+    ];
+
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+    const itemSelect = document.getElementById('item');
+
+    // Get unique values for a dropdown
+    function getUniqueOptions(key, filter = {}) {
+      return [...new Set(data
+        .filter(d => Object.keys(filter).every(k => d[k] === filter[k]))
+        .map(d => d[key]))];
+    }
+
+    // Populate dropdown
+    function populateDropdown(select, options) {
+      select.innerHTML = '';
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.text = opt;
+        select.appendChild(option);
+      });
+    }
+
+    // Populate category on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const categories = getUniqueOptions('Category');
+      populateDropdown(categorySelect, categories);
+
+      categorySelect.dispatchEvent(new Event('change'));
+    });
+
+    categorySelect.addEventListener('change', () => {
+      const subcategories = getUniqueOptions('Subcategory', { Category: categorySelect.value });
+      populateDropdown(subcategorySelect, subcategories);
+      subcategorySelect.dispatchEvent(new Event('change'));
+    });
+
+    subcategorySelect.addEventListener('change', () => {
+      const items = getUniqueOptions('Item', {
+        Category: categorySelect.value,
+        Subcategory: subcategorySelect.value
+      });
+      populateDropdown(itemSelect, items);
+    });
+
+    // Form submission
+    document.getElementById('dynamicForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = {
+        category: categorySelect.value,
+        subcategory: subcategorySelect.value,
+        item: itemSelect.value
+      };
+
+      fetch('https://hook.us1.make.com/your-webhook-id', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      }).then(() => {
+        alert("Submitted successfully!");
+        this.reset();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -2,37 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dynamic Dropdown Form</title>
+  <title>Student Selector</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       max-width: 500px;
-      margin: 50px auto;
+      margin: 40px auto;
       padding: 20px;
+      background: #f8f8f8;
+      border-radius: 10px;
       border: 1px solid #ccc;
-      border-radius: 12px;
-      background-color: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
     }
 
     label {
-      font-weight: bold;
       display: block;
       margin-top: 20px;
+      font-weight: bold;
     }
 
     select, button {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
       font-size: 16px;
+      margin-top: 5px;
     }
 
     button {
+      margin-top: 30px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-      margin-top: 30px;
     }
 
     button:hover {
@@ -42,91 +46,89 @@
 </head>
 <body>
 
-  <h2>Dynamic Excel-based Form</h2>
+  <h2>Select a Student</h2>
 
-  <form id="dynamicForm">
-    <label for="category">Category:</label>
-    <select id="category" required></select>
+  <form id="studentForm">
+    <label for="year">Year:</label>
+    <select id="year" required></select>
 
-    <label for="subcategory">Subcategory:</label>
-    <select id="subcategory" required></select>
+    <label for="form">Form:</label>
+    <select id="form" required></select>
 
-    <label for="item">Item:</label>
-    <select id="item" required></select>
+    <label for="student">Student:</label>
+    <select id="student" required></select>
 
     <button type="submit">Submit</button>
   </form>
 
   <script>
-    fetch("https://jpallipath.github.io/Form-Host/data.json")
-      .then(response => response.json())
-      .then(data => {
-        const categorySelect = document.getElementById('category');
-        const subcategorySelect = document.getElementById('subcategory');
-        const itemSelect = document.getElementById('item');
+    let data = [];
 
-        const unique = (arr) => [...new Set(arr)];
+    fetch("https://jpallipath.github.io/Fom-Host/data.json")
+      .then(res => res.json())
+      .then(json => {
+        data = json;
 
-        // Populate Category
-        const categories = unique(data.map(row => row.Category));
-        categories.forEach(cat => {
-          const opt = new Option(cat, cat);
-          categorySelect.appendChild(opt);
+        const yearSelect = document.getElementById("year");
+        const formSelect = document.getElementById("form");
+        const studentSelect = document.getElementById("student");
+
+        // Populate Year dropdown
+        const years = [...new Set(data.map(item => item.Year))];
+        years.forEach(year => {
+          yearSelect.appendChild(new Option(year, year));
         });
 
-        // Update Subcategory based on Category
-        categorySelect.addEventListener('change', () => {
-          const subcategories = unique(
-            data.filter(row => row.Category === categorySelect.value).map(row => row.Subcategory)
-          );
-          subcategorySelect.innerHTML = '';
-          subcategories.forEach(sub => {
-            const opt = new Option(sub, sub);
-            subcategorySelect.appendChild(opt);
-          });
+        yearSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
 
-          subcategorySelect.dispatchEvent(new Event('change'));
+          const forms = [...new Set(data
+            .filter(item => item.Year === selectedYear)
+            .map(item => item.Form))];
+
+          formSelect.innerHTML = '';
+          studentSelect.innerHTML = '';
+
+          forms.forEach(f => formSelect.appendChild(new Option(f, f)));
+
+          formSelect.dispatchEvent(new Event('change'));
         });
 
-        // Update Item based on Subcategory
-        subcategorySelect.addEventListener('change', () => {
-          const items = data
-            .filter(row =>
-              row.Category === categorySelect.value &&
-              row.Subcategory === subcategorySelect.value
-            ).map(row => row.Item);
-          itemSelect.innerHTML = '';
-          items.forEach(item => {
-            const opt = new Option(item, item);
-            itemSelect.appendChild(opt);
-          });
+        formSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
+          const selectedForm = formSelect.value;
+
+          const students = data
+            .filter(item => item.Year === selectedYear && item.Form === selectedForm)
+            .map(item => item.Student);
+
+          studentSelect.innerHTML = '';
+          students.forEach(s => studentSelect.appendChild(new Option(s, s)));
         });
 
-        // Initialize
-        categorySelect.dispatchEvent(new Event('change'));
+        yearSelect.dispatchEvent(new Event('change'));
       });
 
-    // Optional: Submit to Make.com Webhook
-    document.getElementById("dynamicForm").addEventListener("submit", function(e) {
+    // Optional: Submit to webhook
+    document.getElementById("studentForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
       const payload = {
-        category: document.getElementById("category").value,
-        subcategory: document.getElementById("subcategory").value,
-        item: document.getElementById("item").value
+        year: document.getElementById("year").value,
+        form: document.getElementById("form").value,
+        student: document.getElementById("student").value
       };
 
-      // Replace this with your actual Make.com Webhook URL
-      fetch("https://hook.eu2.make.com/fuvkqa16l8eh1m9goj573rng56cm94kf", {
+      fetch("https://hook.us1.make.com/YOUR-WEBHOOK-ID", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      }).then(() => {
-        alert("Form submitted successfully!");
+      })
+      .then(() => {
+        alert("Form submitted!");
         this.reset();
-      }).catch(() => {
-        alert("Error submitting form.");
-      });
+      })
+      .catch(() => alert("Submission failed."));
     });
   </script>
 

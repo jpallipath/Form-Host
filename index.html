@@ -69,4 +69,111 @@
     </div>
 
     <label for="year">Year:</label>
-    <select id="year" requi
+    <select id="year" required></select>
+
+    <label for="form">Form:</label>
+    <select id="form" required></select>
+
+    <label for="student">Student:</label>
+    <select id="student" required></select>
+
+    <label for="reason">Reason for Request:</label>
+    <textarea id="reason" name="reason" rows="3" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    let data = [];
+
+    // Fetch student data from GitHub-hosted JSON
+    fetch("https://jpallipath.github.io/Form-Host/data.json")
+      .then(res => res.json())
+      .then(json => {
+        data = json;
+
+        const yearSelect = document.getElementById("year");
+        const formSelect = document.getElementById("form");
+        const studentSelect = document.getElementById("student");
+
+        // Populate Year dropdown
+        const years = [...new Set(data.map(item => item.Year))];
+        years.forEach(year => {
+          yearSelect.appendChild(new Option(year, year));
+        });
+
+        yearSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
+
+          const forms = [...new Set(data
+            .filter(item => item.Year === selectedYear)
+            .map(item => item.Form))];
+
+          formSelect.innerHTML = '';
+          studentSelect.innerHTML = '';
+
+          forms.forEach(f => formSelect.appendChild(new Option(f, f)));
+
+          formSelect.dispatchEvent(new Event('change'));
+        });
+
+        formSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
+          const selectedForm = formSelect.value;
+
+          const students = data
+            .filter(item => item.Year === selectedYear && item.Form === selectedForm)
+            .map(item => item.Student);
+
+          studentSelect.innerHTML = '';
+          students.forEach(s => studentSelect.appendChild(new Option(s, s)));
+        });
+
+        yearSelect.dispatchEvent(new Event('change'));
+      });
+
+    // Show/hide Cover Room field based on Room Type
+    document.getElementById("roomType").addEventListener("change", function () {
+      const coverDiv = document.getElementById("coverRoomDiv");
+      const coverInput = document.getElementById("coverRoom");
+
+      if (this.value === "Cover Lesson") {
+        coverDiv.style.display = "block";
+        coverInput.setAttribute("required", "required");
+      } else {
+        coverDiv.style.display = "none";
+        coverInput.removeAttribute("required");
+        coverInput.value = "";
+      }
+    });
+
+    // Submit form data to Make.com webhook
+    document.getElementById("studentForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const payload = {
+        teacherName: document.getElementById("teacherName").value,
+        roomType: document.getElementById("roomType").value,
+        coverRoom: document.getElementById("coverRoom").value || "",
+        year: document.getElementById("year").value,
+        form: document.getElementById("form").value,
+        student: document.getElementById("student").value,
+        reason: document.getElementById("reason").value
+      };
+
+      fetch("https://hook.eu2.make.com/j88hd61ee2uhr5j6pri2ola44fst344p", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("Form submitted!");
+        this.reset();
+        document.getElementById("coverRoomDiv").style.display = "none"; // Hide field after reset
+      })
+      .catch(() => alert("Submission failed."));
+    });
+  </script>
+
+</body>
+</html>

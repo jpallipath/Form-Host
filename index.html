@@ -24,7 +24,7 @@
       font-weight: bold;
     }
 
-    select, button {
+    select, input, textarea, button {
       width: 100%;
       padding: 10px;
       font-size: 16px;
@@ -58,6 +58,22 @@
     <label for="student">Student:</label>
     <select id="student" required></select>
 
+    <!-- NEW FIELDS -->
+    <label for="visitDate">Date of Visit:</label>
+    <input type="date" id="visitDate" name="visitDate" required>
+
+    <label for="reason">Reason for Visit:</label>
+    <textarea id="reason" name="reason" rows="3" required></textarea>
+
+    <label for="period">Class Period:</label>
+    <select id="period" required>
+      <option value="">-- Select Period --</option>
+      <option value="Period 1">Period 1</option>
+      <option value="Period 2">Period 2</option>
+      <option value="Period 3">Period 3</option>
+      <option value="Period 4">Period 4</option>
+    </select>
+
     <button type="submit">Submit</button>
   </form>
 
@@ -73,7 +89,6 @@
         const formSelect = document.getElementById("form");
         const studentSelect = document.getElementById("student");
 
-        // Populate Year dropdown
         const years = [...new Set(data.map(item => item.Year))];
         years.forEach(year => {
           yearSelect.appendChild(new Option(year, year));
@@ -109,14 +124,16 @@
         yearSelect.dispatchEvent(new Event('change'));
       });
 
-    // Optional: Submit to webhook
     document.getElementById("studentForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
       const payload = {
         year: document.getElementById("year").value,
         form: document.getElementById("form").value,
-        student: document.getElementById("student").value
+        student: document.getElementById("student").value,
+        visitDate: document.getElementById("visitDate").value,
+        reason: document.getElementById("reason").value,
+        period: document.getElementById("period").value
       };
 
       fetch("https://hook.eu2.make.com/j88hd61ee2uhr5j6pri2ola44fst344p", {

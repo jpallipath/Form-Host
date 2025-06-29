@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Student Selector</title>
+  <title>Student Request Form</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,112 +42,31 @@
     button:hover {
       background-color: #45a049;
     }
+
+    #coverRoomDiv {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Select a Student</h2>
+  <h2>Student Request Form</h2>
 
   <form id="studentForm">
-    <label for="year">Year:</label>
-    <select id="year" required></select>
+    <label for="teacherName">Name of the Teacher:</label>
+    <input type="text" id="teacherName" name="teacherName" required>
 
-    <label for="form">Form:</label>
-    <select id="form" required></select>
-
-    <label for="student">Student:</label>
-    <select id="student" required></select>
-
-    <!-- NEW FIELDS -->
-    <label for="visitDate">Date of Visit:</label>
-    <input type="date" id="visitDate" name="visitDate" required>
-
-    <label for="reason">Reason for Visit:</label>
-    <textarea id="reason" name="reason" rows="3" required></textarea>
-
-    <label for="period">Class Period:</label>
-    <select id="period" required>
-      <option value="">-- Select Period --</option>
-      <option value="Period 1">Period 1</option>
-      <option value="Period 2">Period 2</option>
-      <option value="Period 3">Period 3</option>
-      <option value="Period 4">Period 4</option>
+    <label for="roomType">Room Number:</label>
+    <select id="roomType" required>
+      <option value="">-- Select Room Type --</option>
+      <option value="Teaching Room">Teaching Room</option>
+      <option value="Cover Lesson">Cover Lesson</option>
     </select>
 
-    <button type="submit">Submit</button>
-  </form>
+    <div id="coverRoomDiv">
+      <label for="coverRoom">Cover Lesson Room Number:</label>
+      <input type="text" id="coverRoom" name="coverRoom">
+    </div>
 
-  <script>
-    let data = [];
-
-    fetch("https://jpallipath.github.io/Form-Host/data.json")
-      .then(res => res.json())
-      .then(json => {
-        data = json;
-
-        const yearSelect = document.getElementById("year");
-        const formSelect = document.getElementById("form");
-        const studentSelect = document.getElementById("student");
-
-        const years = [...new Set(data.map(item => item.Year))];
-        years.forEach(year => {
-          yearSelect.appendChild(new Option(year, year));
-        });
-
-        yearSelect.addEventListener("change", () => {
-          const selectedYear = yearSelect.value;
-
-          const forms = [...new Set(data
-            .filter(item => item.Year === selectedYear)
-            .map(item => item.Form))];
-
-          formSelect.innerHTML = '';
-          studentSelect.innerHTML = '';
-
-          forms.forEach(f => formSelect.appendChild(new Option(f, f)));
-
-          formSelect.dispatchEvent(new Event('change'));
-        });
-
-        formSelect.addEventListener("change", () => {
-          const selectedYear = yearSelect.value;
-          const selectedForm = formSelect.value;
-
-          const students = data
-            .filter(item => item.Year === selectedYear && item.Form === selectedForm)
-            .map(item => item.Student);
-
-          studentSelect.innerHTML = '';
-          students.forEach(s => studentSelect.appendChild(new Option(s, s)));
-        });
-
-        yearSelect.dispatchEvent(new Event('change'));
-      });
-
-    document.getElementById("studentForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const payload = {
-        year: document.getElementById("year").value,
-        form: document.getElementById("form").value,
-        student: document.getElementById("student").value,
-        visitDate: document.getElementById("visitDate").value,
-        reason: document.getElementById("reason").value,
-        period: document.getElementById("period").value
-      };
-
-      fetch("https://hook.eu2.make.com/j88hd61ee2uhr5j6pri2ola44fst344p", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        alert("Form submitted!");
-        this.reset();
-      })
-      .catch(() => alert("Submission failed."));
-    });
-  </script>
-
-</body>
-</html>
+    <label for="year">Year:</label>
+    <select id="year" requi

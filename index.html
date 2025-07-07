@@ -78,7 +78,12 @@
     <select id="student" required></select>
 
     <label for="reason">Reason for Request:</label>
-    <textarea id="reason" name="reason" rows="3" required></textarea>
+<select id="reason" name="reason" required>
+  <option value="">-- Select Reason --</option>
+  <option value="Pupil to Teacher Issue">Pupil to Teacher Issue</option>
+  <option value="Pupil to Pupil Issue">Pupil to Pupil Issue</option>
+</select>
+
 
     <button type="submit">Submit</button>
   </form>

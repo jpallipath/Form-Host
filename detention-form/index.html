@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detention Request Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 30px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Detention Request Form</h2>
+
+  <form id="detentionForm">
+    <label for="teacher">Teacher:</label>
+    <select id="teacher" required>
+      <option value="">-- Select Teacher --</option>
+      <option value="Simi Jacob">Simi Jacob</option>
+      <option value="Rizwana Seenibakeer">Rizwana Seenibakeer</option>
+      <option value="Jawada Pallipath">Jawada Pallipath</option>
+    </select>
+
+    <label for="year">Year Group:</label>
+    <select id="year" required></select>
+
+    <label for="form">Form Group / Set:</label>
+    <select id="form" required></select>
+
+    <label for="student">Student Name:</label>
+    <select id="student" required></select>
+
+    <label for="reason">Reason for Detention:</label>
+    <select id="reason" required>
+      <option value="">-- Select Reason --</option>
+      <option value="Academic/Departmental">Academic/Departmental</option>
+      <option value="Pastoral">Pastoral</option>
+    </select>
+
+    <label for="date">Date Detention to be Completed:</label>
+    <input type="date" id="date" required>
+
+    <label for="length">Length of Detention:</label>
+    <select id="length" required>
+      <option value="">-- Select Length --</option>
+      <option value="15 minutes">15 minutes</option>
+      <option value="25 minutes">25 minutes</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="confirmed" required>
+      This detention, and the reasons why it has been given, have been recorded on iSAMS
+    </label>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    let data = [];
+
+    // Load JSON data
+    fetch("https://jpallipath.github.io/Form-Host/data.json")
+      .then(res => res.json())
+      .then(json => {
+        data = json;
+
+        const yearSelect = document.getElementById("year");
+        const formSelect = document.getElementById("form");
+        const studentSelect = document.getElementById("student");
+
+        // Populate Year
+        const years = [...new Set(data.map(item => item.Year))];
+        years.forEach(year => {
+          yearSelect.appendChild(new Option(year, year));
+        });
+
+        yearSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
+          const forms = [...new Set(data.filter(item => item.Year === selectedYear).map(item => item.Form))];
+          formSelect.innerHTML = '';
+          studentSelect.innerHTML = '';
+          forms.forEach(f => formSelect.appendChild(new Option(f, f)));
+          formSelect.dispatchEvent(new Event('change'));
+        });
+
+        formSelect.addEventListener("change", () => {
+          const selectedYear = yearSelect.value;
+          const selectedForm = formSelect.value;
+          const students = data.filter(item =>
+            item.Year === selectedYear && item.Form === selectedForm
+          ).map(item => item.Student);
+
+          studentSelect.innerHTML = '';
+          students.forEach(s => studentSelect.appendChild(new Option(s, s)));
+        });
+
+        yearSelect.dispatchEvent(new Event('change'));
+      });
+
+    // Set date to next working day (skip Fri & Sat)
+    function getNextWorkingDay() {
+      const today = new Date();
+      let day = today.getDay();
+      let offset = 1;
+
+      if (day === 4) offset = 3; // Thursday → Sunday
+      else if (day === 5) offset = 2; // Friday → Sunday
+      else if (day === 6) offset = 1; // Saturday → Sunday
+
+      const nextDay = new Date(today);
+      nextDay.setDate(today.getDate() + offset);
+      return nextDay.toISOString().split('T')[0];
+    }
+
+    document.getElementById("date").value = getNextWorkingDay();
+
+    // Submit handler
+    document.getElementById("detentionForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const payload = {
+        teacher: document.getElementById("teacher").value,
+        year: document.getElementById("year").value,
+        form: document.getElementById("form").value,
+        student: document.getElementById("student").value,
+        reason: document.getElementById("reason").value,
+        date: document.getElementById("date").value,
+        length: document.getElementById("length").value,
+        confirmed: document.getElementById("confirmed").checked
+      };
+
+      fetch("https://hook.eu2.make.com/j88hd61ee2uhr5j6pri2ola44fst344p", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("Form submitted!");
+        this.reset();
+        document.getElementById("date").value = getNextWorkingDay(); // Re-set date
+      })
+      .catch(() => alert("Submission failed."));
+    });
+  </script>
+
+</body>
+</html>

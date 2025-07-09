@@ -54,16 +54,19 @@
 
   <form id="studentForm">
     <label for="teacherName">Name of the Teacher:</label>
-<select id="teacherName" name="teacherName" required>
-  <option value="">-- Select Teacher --</option>
-  <option value="Jawada Pallipath">Jawada Pallipath</option>
-  <option value="Rizwana Seenibakeer">Rizwana Seenibakeer</option>
-  <option value="Simi Jacob">Simi Jacob</option>
-  <option value="Caroline Flynn">Caroline Flynn</option>
-  <option value="Munazza Mukhtar">Munazza Mukhtar</option>
-  <option value="Shahmila Iqbal">Shahmila Iqbal</option>
-  <option value="Nadira Rahman">Nadira Rahman</option>
-</select>
+    <select id="teacherName" name="teacherName" required>
+      <option value="">-- Select Teacher --</option>
+      <option value="Jawada Pallipath" data-email="jawada.pallipath@school.com">Jawada Pallipath</option>
+      <option value="Rizwana Seenibakeer" data-email="rizwana.seenibakeer@school.com">Rizwana Seenibakeer</option>
+      <option value="Simi Jacob" data-email="simi.jacob@school.com">Simi Jacob</option>
+      <option value="Caroline Flynn" data-email="caroline.flynn@school.com">Caroline Flynn</option>
+      <option value="Munazza Mukhtar" data-email="munazza.mukhtar@school.com">Munazza Mukhtar</option>
+      <option value="Shahmila Iqbal" data-email="shahmila.iqbal@school.com">Shahmila Iqbal</option>
+      <option value="Nadira Rahman" data-email="nadira.rahman@school.com">Nadira Rahman</option>
+    </select>
+
+    <!-- Hidden field for email -->
+    <input type="hidden" id="teacherEmail" name="teacherEmail">
 
     <label for="roomType">Room Number:</label>
     <select id="roomType" required>
@@ -87,12 +90,11 @@
     <select id="student" required></select>
 
     <label for="reason">Reason for Request:</label>
-<select id="reason" name="reason" required>
-  <option value="">-- Select Reason --</option>
-  <option value="Pupil to Teacher Issue">Pupil to Teacher Issue</option>
-  <option value="Pupil to Pupil Issue">Pupil to Pupil Issue</option>
-</select>
-
+    <select id="reason" name="reason" required>
+      <option value="">-- Select Reason --</option>
+      <option value="Pupil to Teacher Issue">Pupil to Teacher Issue</option>
+      <option value="Pupil to Pupil Issue">Pupil to Pupil Issue</option>
+    </select>
 
     <button type="submit">Submit</button>
   </form>
@@ -161,12 +163,20 @@
       }
     });
 
+    // Set teacherEmail when teacher is selected
+    document.getElementById("teacherName").addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const email = selectedOption.dataset.email || "";
+      document.getElementById("teacherEmail").value = email;
+    });
+
     // Submit form data to Make.com webhook
     document.getElementById("studentForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
       const payload = {
         teacherName: document.getElementById("teacherName").value,
+        teacherEmail: document.getElementById("teacherEmail").value,
         roomType: document.getElementById("roomType").value,
         coverRoom: document.getElementById("coverRoom").value || "",
         year: document.getElementById("year").value,

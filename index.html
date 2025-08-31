@@ -103,9 +103,12 @@
     let data = [];
 
     // Fetch student data from GitHub-hosted JSON
-    fetch("https://jpallipath.github.io/Form-Host/data.json")
-      .then(res => res.json())
-      .then(json => {
+    const jsonUrl = "https://jpallipath.github.io/Form-Host/data.json?v=" + Date.now();
+
+     fetch(jsonUrl, { cache: "no-store" })
+     .then(res => res.json())
+     .then(json => {
+     {
         data = json;
 
         const yearSelect = document.getElementById("year");
@@ -201,3 +204,4 @@
 
 </body>
 </html>
+

@@ -79,12 +79,9 @@
       <option value="Wafa Awad" data-email="wawad@sherborneqatar.org">Wafa Awad</option>
       <option value="Zakiyah Shabir" data-email="zshabir@sherborneqatar.org">Zakiyah Shabir</option>
     </select>
-      <!-- keep all your other teachers ... -->
-    </select>
 
     <!-- Hidden field for teacher email -->
     <input type="hidden" id="teacherEmail" name="teacherEmail">
-
     <!-- Hidden field for Qatar timestamp -->
     <input type="hidden" id="submittedAtQatar" name="submittedAtQatar">
 
@@ -189,18 +186,21 @@
       }
     });
 
-    // Set teacherEmail
+    // Set teacherEmail on change
     document.getElementById("teacherName").addEventListener("change", function () {
       const selectedOption = this.options[this.selectedIndex];
       const email = selectedOption?.dataset?.email || "";
       document.getElementById("teacherEmail").value = email;
     });
 
-    // Helper for Qatar timestamp
+    // --- Correct Qatar timestamp (always accurate, no double-add) ---
     const pad = n => String(n).padStart(2,"0");
     function getQatarTime() {
       const now = new Date();
-      const qatarMillis = now.getTime() + (3*60 - now.getTimezoneOffset())*60000;
+      // local -> UTC
+      const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
+      // UTC -> Qatar (+3h)
+      const qatarMillis = utcMillis + 3 * 60 * 60000;
       const q = new Date(qatarMillis);
       return `${q.getFullYear()}-${pad(q.getMonth()+1)}-${pad(q.getDate())}T${pad(q.getHours())}:${pad(q.getMinutes())}:${pad(q.getSeconds())}`;
     }
@@ -245,4 +245,3 @@
 
 </body>
 </html>
-

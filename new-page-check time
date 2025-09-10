@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Class Register</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 520px; margin: 40px auto; padding: 24px; background:#f8f8f8; border:1px solid #ddd; border-radius:12px; }
+    h2 { text-align: center; margin-top:0; }
+    label { display:block; margin-top:16px; font-weight:600; }
+    input, button { width:100%; padding:10px; font-size:16px; margin-top:6px; }
+    button { margin-top:20px; background:#0a62ff; color:#fff; border:0; cursor:pointer; }
+    button:hover { background:#094fd0; }
+    .hint { font-size:13px; color:#666; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+  <h2>Class Register</h2>
+
+  <form id="regForm" autocomplete="off">
+    <label for="name">Student Name</label>
+    <input id="name" name="name" placeholder="Enter full name" required />
+
+    <label for="class">Class</label>
+    <input id="class" name="class" placeholder="e.g., 12 Oryx" required />
+
+    <!-- Hidden field for Qatar time -->
+    <input type="hidden" id="submittedAtQatar" name="submittedAtQatar" />
+
+    <button type="submit">Submit</button>
+    <div class="hint">Date & time are captured automatically in Qatar timezone.</div>
+  </form>
+
+  <script>
+    // Pad helper
+    const pad = n => String(n).padStart(2, "0");
+
+    // Build Qatar time (UTC+3) regardless of browser location
+    function getQatarTime() {
+      const now = new Date();
+      const qatarMillis = now.getTime() + (3*60 - now.getTimezoneOffset())*60000;
+      const qatar = new Date(qatarMillis);
+
+      const y = qatar.getFullYear();
+      const m = pad(qatar.getMonth()+1);
+      const d = pad(qatar.getDate());
+      const hh = pad(qatar.getHours());
+      const mm = pad(qatar.getMinutes());
+      const ss = pad(qatar.getSeconds());
+
+      return `${y}-${m}-${d}T${hh}:${mm}:${ss}`;
+    }
+
+    document.getElementById("regForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Generate timestamp silently
+      const submittedAtQatar = getQatarTime();
+      document.getElementById("submittedAtQatar").value = submittedAtQatar;
+
+      // Build payload
+      const payload = {
+        name: document.getElementById("name").value,
+        class: document.getElementById("class").value,
+        submittedAtQatar
+      };
+
+      // Replace with your Make.com webhook URL
+      fetch("https://hook.eu2.make.com/your-webhook-id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("Saved!");
+        this.reset();
+      })
+      .catch(() => alert("Failed to submit."));
+    });
+  </script>
+</body>
+</html>

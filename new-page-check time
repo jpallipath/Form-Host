@@ -67,7 +67,7 @@
       };
 
       // Replace with your Make.com webhook URL
-      fetch("https://hook.eu2.make.com/your-webhook-id", {
+      fetch("https://hook.eu2.make.com/uc9ygpskgf9ur0huafdbhojqdilbl4m2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

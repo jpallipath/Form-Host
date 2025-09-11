@@ -39,7 +39,7 @@
       <option value="Caitlin Steele" data-email="csteele@sherborneqatar.org">Caitlin Steele</option>
       <option value="Caroline Mary Flynn" data-email="cflynn@sherborneqatar.org">Caroline Mary Flynn</option>
       <option value="Ela Hammudi" data-email="ehammudi@sherborneqatar.org">Ela Hammudi</option>
-      <option value="Enas  A. M. Mhidat" data-email="emhidat@sherborneqatar.org">Enas  A. M. Mhidat</option>
+      <option value="Enas A. M. Mhidat" data-email="emhidat@sherborneqatar.org">Enas A. M. Mhidat</option>
       <option value="Fatima Abdullahi Osman" data-email="fosman@sherborneqatar.org">Fatima Abdullahi Osman</option>
       <option value="Hadeel Shaker Salem Ghanem Abunaheya" data-email="habunaheya@sherborneqatar.org">Hadeel Shaker Salem Ghanem Abunaheya</option>
       <option value="Hajer Belhaj Salah" data-email="hsalah@sherborneqatar.org">Hajer Belhaj Salah</option>
@@ -78,10 +78,12 @@
       <option value="Toni Redden" data-email="tredden@sherborneqatar.org">Toni Redden</option>
       <option value="Wafa Awad" data-email="wawad@sherborneqatar.org">Wafa Awad</option>
       <option value="Zakiyah Shabir" data-email="zshabir@sherborneqatar.org">Zakiyah Shabir</option>
+
     </select>
 
     <!-- Hidden field for teacher email -->
     <input type="hidden" id="teacherEmail" name="teacherEmail">
+
     <!-- Hidden field for Qatar timestamp -->
     <input type="hidden" id="submittedAtQatar" name="submittedAtQatar">
 
@@ -186,23 +188,29 @@
       }
     });
 
-    // Set teacherEmail on change
+    // Set teacherEmail
     document.getElementById("teacherName").addEventListener("change", function () {
       const selectedOption = this.options[this.selectedIndex];
       const email = selectedOption?.dataset?.email || "";
       document.getElementById("teacherEmail").value = email;
     });
 
-    // --- Correct Qatar timestamp (always accurate, no double-add) ---
-    const pad = n => String(n).padStart(2,"0");
+    // Helper for Qatar timestamp
     function getQatarTime() {
       const now = new Date();
-      // local -> UTC
-      const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
-      // UTC -> Qatar (+3h)
-      const qatarMillis = utcMillis + 3 * 60 * 60000;
-      const q = new Date(qatarMillis);
-      return `${q.getFullYear()}-${pad(q.getMonth()+1)}-${pad(q.getDate())}T${pad(q.getHours())}:${pad(q.getMinutes())}:${pad(q.getSeconds())}`;
+      const options = {
+        timeZone: "Asia/Qatar",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      };
+      const parts = new Intl.DateTimeFormat("en-GB", options).formatToParts(now);
+      const get = type => parts.find(p => p.type === type).value;
+      return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}:${get("second")}`;
     }
 
     // Submit form

@@ -16,11 +16,26 @@
     h2 { text-align: center; }
     label { display: block; margin-top: 20px; font-weight: bold; }
     select, input, textarea, button {
-      width: 100%; padding: 10px; font-size: 16px; margin-top: 5px;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      box-sizing: border-box;
     }
-    button { margin-top: 30px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    button {
+      margin-top: 30px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
     button:hover { background-color: #45a049; }
     #coverRoomDiv { display: none; }
+    .help-text {
+      font-size: 13px;
+      color: #555;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -28,7 +43,6 @@
   <h2>On Call Request Form</h2>
 
   <form id="studentForm">
-    <!-- Teacher selector -->
     <label for="teacherName">Name of the Teacher:</label>
     <select id="teacherName" name="teacherName" required>
       <option value="">-- Select Teacher --</option>
@@ -78,13 +92,9 @@
       <option value="Toni Redden" data-email="tredden@sherborneqatar.org">Toni Redden</option>
       <option value="Wafa Awad" data-email="wawad@sherborneqatar.org">Wafa Awad</option>
       <option value="Zakiyah Shabir" data-email="zshabir@sherborneqatar.org">Zakiyah Shabir</option>
-
     </select>
 
-    <!-- Hidden field for teacher email -->
     <input type="hidden" id="teacherEmail" name="teacherEmail">
-
-    <!-- Hidden field for Qatar timestamp -->
     <input type="hidden" id="submittedAtQatar" name="submittedAtQatar">
 
     <label for="roomType">Room Number:</label>
@@ -110,9 +120,10 @@
     </select>
 
     <label for="student">Student:</label>
-    <select id="student" required>
-      <option value="">-- Select Student --</option>
-    </select>
+    <select id="student" multiple required size="8"></select>
+    <div class="help-text">
+      Hold Ctrl (Windows) or Cmd (Mac) to select multiple students.
+    </div>
 
     <label for="reason">Reason for Request:</label>
     <select id="reason" name="reason" required>
@@ -126,7 +137,6 @@
   </form>
 
   <script>
-    // --- Load JSON (cache-busted) ---
     const jsonUrl = "https://jpallipath.github.io/Form-Host/data.json?v=" + Date.now();
 
     fetch(jsonUrl, { cache: "no-store" })
@@ -138,7 +148,6 @@
         const formSelect = document.getElementById("form");
         const studentSelect = document.getElementById("student");
 
-        // Populate Year dropdown
         const years = [...new Set(data.map(item => item.Year))].sort();
         years.forEach(year => yearSelect.appendChild(new Option(year, year)));
 
@@ -150,10 +159,9 @@
           )].sort();
 
           formSelect.innerHTML = '<option value="">-- Select Form --</option>';
-          studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
+          studentSelect.innerHTML = '';
 
           forms.forEach(f => formSelect.appendChild(new Option(f, f)));
-
           formSelect.dispatchEvent(new Event('change'));
         });
 
@@ -165,7 +173,7 @@
             .filter(item => item.Year === selectedYear && item.Form === selectedForm)
             .map(item => item.Student);
 
-          studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
+          studentSelect.innerHTML = '';
           students.forEach(s => studentSelect.appendChild(new Option(s, s)));
         });
 
@@ -173,7 +181,6 @@
       })
       .catch(err => console.error("Failed to load data.json:", err));
 
-    // Show/hide Cover Room field
     document.getElementById("roomType").addEventListener("change", function () {
       const coverDiv = document.getElementById("coverRoomDiv");
       const coverInput = document.getElementById("coverRoom");
@@ -188,14 +195,12 @@
       }
     });
 
-    // Set teacherEmail
     document.getElementById("teacherName").addEventListener("change", function () {
       const selectedOption = this.options[this.selectedIndex];
       const email = selectedOption?.dataset?.email || "";
       document.getElementById("teacherEmail").value = email;
     });
 
-    // Helper for Qatar timestamp
     function getQatarTime() {
       const now = new Date();
       const options = {
@@ -213,12 +218,19 @@
       return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}:${get("second")}`;
     }
 
-    // Submit form
     document.getElementById("studentForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
       const submittedAtQatar = getQatarTime();
       document.getElementById("submittedAtQatar").value = submittedAtQatar;
+
+      const studentSelect = document.getElementById("student");
+      const selectedStudents = Array.from(studentSelect.selectedOptions).map(opt => opt.value);
+
+      if (selectedStudents.length === 0) {
+        alert("Please select at least one student.");
+        return;
+      }
 
       const payload = {
         teacherName: document.getElementById("teacherName").value,
@@ -227,9 +239,9 @@
         coverRoom: document.getElementById("coverRoom").value || "",
         year: document.getElementById("year").value,
         form: document.getElementById("form").value,
-        student: document.getElementById("student").value,
+        student: selectedStudents,
         reason: document.getElementById("reason").value,
-        submittedAtQatar // hidden timestamp
+        submittedAtQatar: submittedAtQatar
       };
 
       fetch("https://hook.eu2.make.com/wnjyzbdv4dyhth6tvt7fyk7cb0elnwrx", {
@@ -243,7 +255,7 @@
         document.getElementById("coverRoomDiv").style.display = "none";
         document.getElementById("year").value = "";
         document.getElementById("form").innerHTML = '<option value="">-- Select Form --</option>';
-        document.getElementById("student").innerHTML = '<option value="">-- Select Student --</option>';
+        document.getElementById("student").innerHTML = '';
         document.getElementById("teacherEmail").value = "";
         document.getElementById("submittedAtQatar").value = "";
       })
@@ -253,6 +265,3 @@
 
 </body>
 </html>
-
-
-

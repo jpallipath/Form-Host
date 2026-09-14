@@ -305,10 +305,7 @@
         alert("Please select at least one student.");
         return;
       }
-       if (!document.querySelector('input[name="returnedToClass"]:checked')) {
-        alert("Please select whether the student returned to class.");
-        return;
-      }
+       
 
       const payload = {
         teacherName: document.getElementById("teacherName").value,

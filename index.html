@@ -200,6 +200,13 @@
       <option value="Gone to toilet for too long">Gone to toilet for too long</option> 
     </select>
 
+    <label for="returnedToClass">Returned to Class:</label>
+    <select id="returnedToClass" name="returnedToClass" required>
+      <option value="">-- Select --</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+
     <button type="submit">Submit</button>
   </form>
 
@@ -298,6 +305,10 @@
         alert("Please select at least one student.");
         return;
       }
+       if (!document.querySelector('input[name="returnedToClass"]:checked')) {
+        alert("Please select whether the student returned to class.");
+        return;
+      }
 
       const payload = {
         teacherName: document.getElementById("teacherName").value,
@@ -308,6 +319,7 @@
         form: document.getElementById("form").value,
         student: selectedStudents,
         reason: document.getElementById("reason").value,
+        returnedToClass: document.getElementById("returnedToClass").value,
         submittedAtQatar: submittedAtQatar
       };
 
